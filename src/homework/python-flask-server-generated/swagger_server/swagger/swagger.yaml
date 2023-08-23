@@ -1,0 +1,173 @@
+openapi: 3.0.0
+info:
+  title: Заказ ресурсов в облаке
+  version: 0.0.1
+servers:
+- url: http://localhost:8080/api/v1/
+  description: Dev server
+paths:
+  /clouds:
+    get:
+      tags:
+      - Clouds
+      summary: Метод получения списка ресурсов на облаке
+      operationId: get_all_clouds
+      responses:
+        "200":
+          description: Успешный ответ со списком ресурсов
+          content:
+            adplication/json:
+              schema:
+                $ref: '#/components/schemas/Clouds'
+        default:
+          description: Остальные ответы
+          content:
+            adplication/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.clouds_controller
+    post:
+      tags:
+      - Clouds
+      summary: Создание заказа в облаке
+      operationId: create_cloud
+      requestBody:
+        content:
+          adplication/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+      responses:
+        "200":
+          description: Успешный заказ
+          content:
+            adplication/json:
+              schema:
+                $ref: '#/components/schemas/Clouds'
+        default:
+          description: Все остальные ответы
+          content:
+            adplication/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.clouds_controller
+  /clouds/{cloud_id}:
+    get:
+      tags:
+      - Clouds
+      summary: Метод получения заказа по ID
+      operationId: get_cloud
+      parameters:
+      - name: cloud_id
+        in: path
+        description: Идентификатор заказа в облаке
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: f102b615
+      responses:
+        "200":
+          description: Успешный ответ с заказом
+          content:
+            adplication/json:
+              schema:
+                $ref: '#/components/schemas/Clouds'
+        "404":
+          description: Заказ не найден
+          content:
+            adplication/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Остальные ответы
+          content:
+            adplication/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.clouds_controller
+    delete:
+      tags:
+      - Clouds
+      summary: Метод отмены заказа в облаке по ID
+      operationId: cancel_cloud_by_id
+      parameters:
+      - name: cloud_id
+        in: path
+        description: Идентификатор заказа в облаке
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: f102b615
+      responses:
+        "200":
+          description: Успешная отмена заказа по ID
+          content:
+            adplication/json: {}
+        "404":
+          description: Заказ не найден
+          content:
+            adplication/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Все остальные ответы
+          content:
+            adplication/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.clouds_controller
+components:
+  schemas:
+    Cloud:
+      required:
+      - CPU
+      - HDD
+      - OS
+      - RAM
+      - id_client
+      type: object
+      properties:
+        cloud_id:
+          type: string
+          example: f102b615
+        id_client:
+          type: string
+          example: f102b615
+        OS:
+          type: string
+          description: Операционная система сервера
+          enum:
+          - Windows
+          - Linux
+        RAM:
+          type: string
+          description: Количество оперативной памяти
+          example: "128"
+        CPU:
+          type: string
+          description: Количество ядер CPU
+          example: "8"
+      example:
+        OS: Windows
+        id_client: f102b615
+        CPU: "8"
+        cloud_id: f102b615
+        RAM: "128"
+    Clouds:
+      type: array
+      items:
+        $ref: '#/components/schemas/Cloud'
+    Error:
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+
